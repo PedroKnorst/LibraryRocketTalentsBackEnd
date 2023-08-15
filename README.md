@@ -5,7 +5,7 @@ At the beggining, the Library project consists creating a borrows books website,
 
 In this repository is the entire back-end part of the refactoring challenge for the Library project. It consists in refactoring the website using React, typescript and creating a back-end file to create the api.
 
-# Tecnologies
+# Technologies
 - Typescript
 - Node Js
 
