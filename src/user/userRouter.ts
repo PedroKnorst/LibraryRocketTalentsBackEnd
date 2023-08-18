@@ -1,9 +1,8 @@
-import * as express from "express";
-import { getUser, getUsers } from "./userControler";
+import * as express from 'express';
+import { postUser } from './userControler';
 
 const userRouter = express.Router();
 
-userRouter.get("/users", getUsers);
-userRouter.get("/users/:account", getUser);
+userRouter.post('/', postUser);
 
 export default userRouter;

@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
-import * as fs from "fs";
+import { Request, Response } from 'express';
+import * as fs from 'fs';
 
-let data = JSON.parse(fs.readFileSync("data.json", "utf-8"));
+let users = JSON.parse(fs.readFileSync('data.json', 'utf-8')).login;
 
 interface User {
   name: string;
@@ -9,16 +9,12 @@ interface User {
   password: string;
 }
 
-export const getUsers = (req: Request, res: Response) => {
-  return res.json(data.login);
-};
+export const postUser = (req: Request, res: Response) => {
+  const { email, password } = req.body;
 
-export const getUser = (req: Request, res: Response) => {
-  const { name }: User = req.body;
+  const user: User = users.find((user: User) => user.email === email && user.password === password);
 
-  const userIndex = data.login.findIndex((ind: User) => ind.name === name);
+  if (user) res.status(404).json({ error: 'User not Found!' });
 
-  const user = data.login[userIndex];
-
-  return res.json(user);
+  return res.status(201).json(user.name);
 };

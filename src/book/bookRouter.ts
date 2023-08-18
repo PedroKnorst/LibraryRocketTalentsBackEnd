@@ -10,11 +10,11 @@ import {
 
 const bookRouter = express.Router();
 
-bookRouter.get("/books", getBooks);
-bookRouter.get("/books/history", getHistory);
-bookRouter.get("/books/:id", getBook);
-bookRouter.post("/books", postBook);
-bookRouter.put("/books/:id", putBook);
-bookRouter.delete("/books/:id", deleteBook);
+bookRouter.get("/", getBooks);
+bookRouter.get("/history", getHistory);
+bookRouter.get("/:id", getBook);
+bookRouter.post("/", postBook);
+bookRouter.put("/:id", putBook);
+bookRouter.delete("/:id", deleteBook);
 
 export default bookRouter;

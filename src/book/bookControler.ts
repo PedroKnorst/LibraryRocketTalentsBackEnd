@@ -1,7 +1,7 @@
-import * as fs from "fs";
-import { Request, Response } from "express";
+import * as fs from 'fs';
+import { Request, Response } from 'express';
 
-let data = JSON.parse(fs.readFileSync("data.json", "utf-8"));
+let books = JSON.parse(fs.readFileSync('data.json', 'utf-8')).books;
 
 interface Loan {
   bookTitle?: string;
@@ -28,19 +28,17 @@ interface Book {
 }
 
 export const getBooks = (req: Request, res: Response) => {
-  return res.json(data.books);
+  return res.json(books);
 };
 
 export const getBook = (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const bookIndex = data.books.findIndex((ind: Book) => ind.id === id);
+  const book = books.find((ind: Book) => ind.id === id);
 
-  if (bookIndex < 0) {
-    return res.status(404).json({ error: "Not Found" });
+  if (!book) {
+    return res.status(404).json({ error: 'Book not Found' });
   }
-
-  let book = data.books[bookIndex];
 
   return res.json(book);
 };
@@ -48,17 +46,17 @@ export const getBook = (req: Request, res: Response) => {
 export const getHistory = (req: Request, res: Response) => {
   const history: Loan[] = [];
 
-  data.books.map((book: Book) => {
-    book.rentHistory.map((user: Loan) => {
-      user = {
+  books.forEach((book: Book) => {
+    book.rentHistory.forEach((loan: Loan) => {
+      const loanHistory = {
         bookTitle: book.title,
-        studentName: user.studentName,
-        class: user.class,
-        withdrawalDate: user.withdrawalDate,
-        deliveryDate: user.deliveryDate,
+        studentName: loan.studentName,
+        class: loan.class,
+        withdrawalDate: loan.withdrawalDate,
+        deliveryDate: loan.deliveryDate,
       };
 
-      history.push(user);
+      history.push(loanHistory);
     });
   });
 
@@ -66,70 +64,44 @@ export const getHistory = (req: Request, res: Response) => {
 };
 
 export const postBook = (req: Request, res: Response) => {
-  const {
-    title,
-    author,
-    genre,
-    status,
-    image,
-    systemEntryDate,
-    synopsis,
-    isBorrowed,
-    rentHistory,
-  } = req.body;
+  const { title, author, genre, image, systemEntryDate, synopsis } = req.body;
 
-  let newId = Number.parseInt(data.books[data.books.length - 1].id) + 1;
+  let newId = Number.parseInt(books[books.length - 1].id) + 1;
 
   const book: Book = {
     id: newId.toString(),
     title,
     author,
     genre,
-    status,
+    status: {
+      isActive: true,
+      description: '',
+    },
     image,
     systemEntryDate,
     synopsis,
-    isBorrowed,
-    rentHistory,
+    isBorrowed: false,
+    rentHistory: [],
   };
 
-  data.books.push(book);
+  books.push(book);
 
-  return res.status(201).json(data.books);
+  return res.status(201).json(book);
 };
 
 export const putBook = (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const {
-    title,
-    author,
-    genre,
-    status,
-    image,
-    systemEntryDate,
-    synopsis,
-    isBorrowed,
-    rentHistory,
-  } = req.body;
+  const { title, author, genre, status, image, systemEntryDate, synopsis, isBorrowed, rentHistory } = req.body;
 
-  const bookIndex = data.books.findIndex((ind: Book) => ind.id === id);
+  const bookIndex = books.findIndex((ind: Book) => ind.id === id);
 
   if (bookIndex < 0) {
-    return res.status(404).json({ error: "Not Found" });
+    return res.status(404).json({ error: 'Not Found' });
   }
 
-  if (
-    !title ||
-    !author ||
-    !genre ||
-    !status ||
-    !image ||
-    !systemEntryDate ||
-    !synopsis ||
-    !rentHistory
-  ) {
-    return res.status(400).json({ error: "Not enough informations" });
+  if (!title || !author || !genre || !status || !image || !systemEntryDate || !synopsis || !rentHistory) {
+    return res.status(400).json({ error: 'Not enough informations' });
   }
 
   const book = {
@@ -145,7 +117,7 @@ export const putBook = (req: Request, res: Response) => {
     rentHistory,
   };
 
-  data.books[bookIndex] = book;
+  books[bookIndex] = book;
 
   return res.json(book);
 };
@@ -153,13 +125,13 @@ export const putBook = (req: Request, res: Response) => {
 export const deleteBook = (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const idBook = data.books.findIndex((ind: Book) => ind.id === id);
+  const idBook = books.findIndex((ind: Book) => ind.id === id);
 
   if (idBook < 0) {
-    return res.status(404).json({ error: "Not Found" });
+    return res.status(404).json({ error: 'Not Found' });
   }
 
-  data.books.splice(idBook, 1);
+  books.splice(idBook, 1);
 
-  return res.status(204).json(data.books);
+  return res.status(204).json(books);
 };
