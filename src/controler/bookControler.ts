@@ -1,7 +1,8 @@
 import * as fs from 'fs';
 import { Request, Response } from 'express';
 
-let books = JSON.parse(fs.readFileSync('data.json', 'utf-8')).books;
+let data = JSON.parse(fs.readFileSync('./data/data.json', 'utf-8'));
+let books: Book[] = data.books;
 
 interface Loan {
   bookTitle?: string;
@@ -37,7 +38,7 @@ export const getBook = (req: Request, res: Response) => {
   const book = books.find((ind: Book) => ind.id === id);
 
   if (!book) {
-    return res.status(404).json({ error: 'Book not Found' });
+    return res.status(404).json({ error: 'Not Found!' });
   }
 
   return res.json(book);
@@ -68,6 +69,10 @@ export const postBook = (req: Request, res: Response) => {
 
   let newId = Number.parseInt(books[books.length - 1].id) + 1;
 
+  if (!title || !author || !genre || !image || !systemEntryDate || !synopsis) {
+    return res.status(400).json({ error: 'Not enough informations' });
+  }
+
   const book: Book = {
     id: newId.toString(),
     title,
@@ -85,6 +90,8 @@ export const postBook = (req: Request, res: Response) => {
   };
 
   books.push(book);
+
+  fs.writeFileSync('./data/data.json', JSON.stringify(data, null, 2), 'utf-8');
 
   return res.status(201).json(book);
 };
@@ -110,14 +117,16 @@ export const putBook = (req: Request, res: Response) => {
     author,
     genre,
     status,
+    isBorrowed,
     image,
     systemEntryDate,
     synopsis,
-    isBorrowed,
     rentHistory,
   };
 
   books[bookIndex] = book;
+
+  fs.writeFileSync('./data/data.json', JSON.stringify(data, null, 2), 'utf-8');
 
   return res.json(book);
 };
@@ -132,6 +141,8 @@ export const deleteBook = (req: Request, res: Response) => {
   }
 
   books.splice(idBook, 1);
+
+  fs.writeFileSync('data.json', JSON.stringify(data, null, 2), 'utf-8');
 
   return res.status(204).json(books);
 };
