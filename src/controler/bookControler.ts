@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import { Request, Response } from 'express';
+import { AppError } from '../middlewares/errorHandler';
 
 let data = JSON.parse(fs.readFileSync('./data/data.json', 'utf-8'));
 let books: Book[] = data.books;
@@ -38,7 +39,7 @@ export const getBook = (req: Request, res: Response) => {
   const book = books.find((ind: Book) => ind.id === id);
 
   if (!book) {
-    return res.status(404).json({ error: 'Not Found!' });
+    throw new AppError('Not Found', 404);
   }
 
   return res.json(book);
@@ -70,7 +71,7 @@ export const postBook = (req: Request, res: Response) => {
   let newId = Number.parseInt(books[books.length - 1].id) + 1;
 
   if (!title || !author || !genre || !image || !systemEntryDate || !synopsis) {
-    return res.status(400).json({ error: 'Not enough informations' });
+    throw new AppError('Not Enough Informations', 400);
   }
 
   const book: Book = {
@@ -104,11 +105,11 @@ export const putBook = (req: Request, res: Response) => {
   const bookIndex = books.findIndex((ind: Book) => ind.id === id);
 
   if (bookIndex < 0) {
-    return res.status(404).json({ error: 'Not Found' });
+    throw new AppError('Not Found', 404);
   }
 
   if (!title || !author || !genre || !status || !image || !systemEntryDate || !synopsis || !rentHistory) {
-    return res.status(400).json({ error: 'Not enough informations' });
+    throw new AppError('Not Enough Informations', 400);
   }
 
   const book = {
@@ -137,7 +138,7 @@ export const deleteBook = (req: Request, res: Response) => {
   const idBook = books.findIndex((ind: Book) => ind.id === id);
 
   if (idBook < 0) {
-    return res.status(404).json({ error: 'Not Found' });
+    throw new AppError('Not Found', 404);
   }
 
   books.splice(idBook, 1);

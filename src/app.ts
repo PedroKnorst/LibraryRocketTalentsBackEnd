@@ -4,7 +4,7 @@ import userRouter from './routes/userRouter';
 import * as cors from 'cors';
 import * as multer from 'multer';
 import * as path from 'path';
-import ErrorHandler from './middlewares/errorHandler';
+import { ErrorHandler } from './middlewares/errorHandler';
 
 const app = express();
 
@@ -31,8 +31,6 @@ const storage = multer.diskStorage({
 const upload = multer({ dest: '../public', storage: storage });
 
 app.post('/photos', upload.single('uploaded_file'), (req, res) => {
-  console.log(req.file);
-
   const file = req.file?.filename;
 
   return res.json(file);
