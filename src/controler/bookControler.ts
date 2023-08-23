@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { Request, Response } from 'express';
 import { AppError } from '../middlewares/errorHandler';
+import { z } from 'zod';
 
 let data = JSON.parse(fs.readFileSync('./data/data.json', 'utf-8'));
 let books: Book[] = data.books;
@@ -29,12 +30,37 @@ interface Book {
   rentHistory: Loan[];
 }
 
+const bookParser = z.object({
+  title: z.string(),
+  author: z.string(),
+  genre: z.string(),
+  status: z.object({
+    isActive: z.boolean(),
+    description: z.string(),
+  }),
+  isBorrowed: z.boolean(),
+  image: z.string(),
+  systemEntryDate: z.string(),
+  synopsis: z.string(),
+  rentHistory: z.array(
+    z.object({
+      bookTitle: z.string(),
+      studentName: z.string(),
+      class: z.string(),
+      withdrawalDate: z.string(),
+      deliveryDate: z.string(),
+    })
+  ),
+});
+
 export const getBooks = (req: Request, res: Response) => {
   return res.json(books);
 };
 
 export const getBook = (req: Request, res: Response) => {
-  const { id } = req.params;
+  const idParser = z.object({ id: z.string() });
+  const parseParams = idParser.parse(req.params);
+  const { id } = parseParams;
 
   const book = books.find((ind: Book) => ind.id === id);
 
@@ -66,7 +92,17 @@ export const getHistory = (req: Request, res: Response) => {
 };
 
 export const postBook = (req: Request, res: Response) => {
-  const { title, author, genre, image, systemEntryDate, synopsis } = req.body;
+  const bookParser = z.object({
+    title: z.string(),
+    author: z.string(),
+    genre: z.string(),
+    image: z.string(),
+    systemEntryDate: z.string(),
+    synopsis: z.string(),
+  });
+
+  const parserBody = bookParser.parse(req.body);
+  const { title, author, genre, image, systemEntryDate, synopsis } = parserBody;
 
   let newId = Number.parseInt(books[books.length - 1].id) + 1;
 
@@ -98,9 +134,12 @@ export const postBook = (req: Request, res: Response) => {
 };
 
 export const putBook = (req: Request, res: Response) => {
-  const { id } = req.params;
+  const idParser = z.object({ id: z.string() });
+  const parseParams = idParser.parse(req.params);
+  const { id } = parseParams;
 
-  const { title, author, genre, status, image, systemEntryDate, synopsis, isBorrowed, rentHistory } = req.body;
+  const parserBody = bookParser.parse(req.body);
+  const { title, author, genre, status, image, systemEntryDate, synopsis, isBorrowed, rentHistory } = parserBody;
 
   const bookIndex = books.findIndex((ind: Book) => ind.id === id);
 
@@ -133,7 +172,9 @@ export const putBook = (req: Request, res: Response) => {
 };
 
 export const deleteBook = (req: Request, res: Response) => {
-  const { id } = req.params;
+  const idParser = z.object({ id: z.string() });
+  const parseParams = idParser.parse(req.params);
+  const { id } = parseParams;
 
   const idBook = books.findIndex((ind: Book) => ind.id === id);
 

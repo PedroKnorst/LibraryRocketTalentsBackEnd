@@ -3,9 +3,10 @@
     "target": "ESNext",
     "strict": true,
     "sourceMap": true,
-    "allowJs": true,
     "removeComments": true,
-    "noImplicitReturns": true
+    "noImplicitReturns": true,
+    "composite": true,
+    "moduleResolution": "Node"
   },
   "include": ["src"],
   "exclude": ["node_modules"]
