@@ -26,5 +26,5 @@ export const postUser = (req: Request, res: Response) => {
     throw new AppError('Not Found', 404);
   }
 
-  return res.status(201).json(user);
+  return res.json({ name: user.name, email: user.email });
 };

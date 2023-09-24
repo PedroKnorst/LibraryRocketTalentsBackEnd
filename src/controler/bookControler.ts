@@ -44,7 +44,7 @@ const bookParser = z.object({
   synopsis: z.string(),
   rentHistory: z.array(
     z.object({
-      bookTitle: z.string(),
+      bookTitle: z.string().optional(),
       studentName: z.string(),
       class: z.string(),
       withdrawalDate: z.string(),
