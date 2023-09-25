@@ -110,6 +110,12 @@ export const postBook = (req: Request, res: Response) => {
     throw new AppError('Not Enough Informations', 400);
   }
 
+  const findRepeatedBookTitle = books.find(book => book.title === title);
+
+  if (findRepeatedBookTitle) {
+    throw new AppError('This book title already exists.', 400);
+  }
+
   const book: Book = {
     id: newId.toString(),
     title,
@@ -131,6 +137,12 @@ export const postBook = (req: Request, res: Response) => {
   fs.writeFileSync('./data/data.json', JSON.stringify(data, null, 2), 'utf-8');
 
   return res.status(201).json(book);
+};
+
+export const filterBooks = (req: Request, res: Response) => {
+  const idParser = z.object({ id: z.string() });
+  const parseParams = idParser.parse(req.params);
+  const { id } = parseParams;
 };
 
 export const putBook = (req: Request, res: Response) => {
