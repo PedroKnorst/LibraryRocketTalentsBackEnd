@@ -139,12 +139,6 @@ export const postBook = (req: Request, res: Response) => {
   return res.status(201).json(book);
 };
 
-export const filterBooks = (req: Request, res: Response) => {
-  const idParser = z.object({ id: z.string() });
-  const parseParams = idParser.parse(req.params);
-  const { id } = parseParams;
-};
-
 export const putBook = (req: Request, res: Response) => {
   const idParser = z.object({ id: z.string() });
   const parseParams = idParser.parse(req.params);
