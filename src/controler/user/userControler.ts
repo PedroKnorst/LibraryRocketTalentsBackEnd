@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import * as fs from 'fs';
-import { AppError } from '../middlewares/errorHandler';
-import { z } from 'zod';
+import { AppError } from '../../middlewares/errorHandler';
 
 let users: User[] = JSON.parse(fs.readFileSync('./data/data.json', 'utf-8')).login;
 
@@ -11,14 +10,8 @@ interface User {
   password: string;
 }
 
-const userParser = z.object({
-  email: z.string(),
-  password: z.string(),
-});
-
 export const postUser = (req: Request, res: Response) => {
-  const bodyParser = userParser.parse(req.body);
-  const { email, password } = bodyParser;
+  const { email, password } = req.body;
 
   const user = users.find((user: User) => user.email === email && user.password === password);
 

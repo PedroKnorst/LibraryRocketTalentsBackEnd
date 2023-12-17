@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { Request, Response } from 'express';
-import { AppError } from '../middlewares/errorHandler';
+import { AppError } from '../../middlewares/errorHandler';
 import { z } from 'zod';
 
 let data = JSON.parse(fs.readFileSync('./data/data.json', 'utf-8'));
@@ -92,17 +92,7 @@ export const getHistory = (req: Request, res: Response) => {
 };
 
 export const postBook = (req: Request, res: Response) => {
-  const bookParser = z.object({
-    title: z.string(),
-    author: z.string(),
-    genre: z.string(),
-    image: z.string(),
-    systemEntryDate: z.string(),
-    synopsis: z.string(),
-  });
-
-  const parserBody = bookParser.parse(req.body);
-  const { title, author, genre, image, systemEntryDate, synopsis } = parserBody;
+  const { title, author, genre, image, systemEntryDate, synopsis } = req.body;
 
   let newId = Number.parseInt(books[books.length - 1].id) + 1;
 
@@ -139,13 +129,10 @@ export const postBook = (req: Request, res: Response) => {
   return res.status(201).json(book);
 };
 
-export const putBook = (req: Request, res: Response) => {
-  const idParser = z.object({ id: z.string() });
-  const parseParams = idParser.parse(req.params);
-  const { id } = parseParams;
+export const patchBook = (req: Request, res: Response) => {
+  const { id } = req.params;
 
-  const parserBody = bookParser.parse(req.body);
-  const { title, author, genre, status, image, systemEntryDate, synopsis, isBorrowed, rentHistory } = parserBody;
+  const { title, author, genre, status, image, systemEntryDate, synopsis, isBorrowed, rentHistory } = req.body;
 
   const bookIndex = books.findIndex((ind: Book) => ind.id === id);
 
@@ -178,9 +165,7 @@ export const putBook = (req: Request, res: Response) => {
 };
 
 export const deleteBook = (req: Request, res: Response) => {
-  const idParser = z.object({ id: z.string() });
-  const parseParams = idParser.parse(req.params);
-  const { id } = parseParams;
+  const { id } = req.params;
 
   const idBook = books.findIndex((ind: Book) => ind.id === id);
 
@@ -190,7 +175,7 @@ export const deleteBook = (req: Request, res: Response) => {
 
   books.splice(idBook, 1);
 
-  fs.writeFileSync('data.json', JSON.stringify(data, null, 2), 'utf-8');
+  fs.writeFileSync('./data/data.json', JSON.stringify(data, null, 2), 'utf-8');
 
   return res.status(204).json(books);
 };

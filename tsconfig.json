@@ -6,6 +6,7 @@
     "removeComments": true,
     "noImplicitReturns": true,
     "composite": true,
+    "allowSyntheticDefaultImports": true,
     "moduleResolution": "Node"
   },
   "include": ["src"],
